@@ -16,14 +16,16 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.add:
-        add_products(args.add)
+        products: list = add_products(args.add)
+        for product in products:
+            print(product)
 
     elif args.fetch:
         fetch()
 
     elif args.list:
 
-        products = list_products()
+        products: list = list_products()
         if len(products) == 0:
             print("No products yet")
             return
@@ -33,7 +35,17 @@ def main() -> None:
 
 
 def add_products(products: list) -> list:
-    ...
+    
+    try:
+        file = open(f"{PRODUCTS_DIRECTORY}{PRODUCTS_FILE}", "a")
+    except FileNotFoundError:
+        sys.exit(f"File not found in {PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
+
+    for product in products:
+        file.write(f"{product}\n")
+    file.close()
+
+    return list_products()
 
 
 def fetch():
