@@ -1,4 +1,9 @@
 import argparse
+import csv
+import sys
+
+PRODUCTS_DIRECTORY = ".persisted/"
+PRODUCTS_FILE = "products_list.csv"
 
 def main() -> None:
     
@@ -11,14 +16,23 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.add:
-        add_products(args.add)  
+        add_products(args.add)
+
     elif args.fetch:
         fetch()
+
     elif args.list:
-        list_products()
+
+        products = list_products()
+        if len(products) == 0:
+            print("No products yet")
+            return
+
+        for product in products:
+            print(product)
 
 
-def add_products(products: list) -> None:
+def add_products(products: list) -> list:
     ...
 
 
@@ -26,8 +40,14 @@ def fetch():
     ...
 
 
-def list_products():
-    ...
+def list_products() -> list:
+    
+    try:
+        file = open(f"{PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
+    except FileNotFoundError:
+        sys.exit(f"File not found in {PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
+    
+    return list(map(str.strip, file))
 
 
 if __name__ == "__main__":
