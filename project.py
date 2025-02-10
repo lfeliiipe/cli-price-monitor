@@ -1,9 +1,7 @@
 import argparse
 import csv
 import sys
-
-PRODUCTS_DIRECTORY = ".persisted/"
-PRODUCTS_FILE = "products_list.csv"
+from persist import Persist
 
 def main() -> None:
     
@@ -15,8 +13,12 @@ def main() -> None:
     group.add_argument("-l", "--list", action="store_true", help="List products")
     args = parser.parse_args()
 
+    p: Persist = Persist(".persisted/products_list.csv")
+
+    # Menu
     if args.add:
-        products: list = add_products(args.add)
+        products: list = add_products(args.add, p)
+        print("Updated Products List:")
         for product in products:
             print(product)
 
@@ -25,7 +27,7 @@ def main() -> None:
 
     elif args.list:
 
-        products: list = list_products()
+        products: list = list_products(p)
         if len(products) == 0:
             print("No products yet")
             return
@@ -34,32 +36,27 @@ def main() -> None:
             print(product)
 
 
-def add_products(products: list) -> list:
-    
-    try:
-        file = open(f"{PRODUCTS_DIRECTORY}{PRODUCTS_FILE}", "a")
-    except FileNotFoundError:
-        sys.exit(f"File not found in {PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
+def add_products(new_products: list, p: Persist) -> list:
 
-    for product in products:
-        file.write(f"{product}\n")
+    file = p.open_to("a")
+    for new_product in new_products:
+        file.write(f"{new_product}\n")
     file.close()
 
-    return list_products()
+    return list_products(p)
 
 
 def fetch():
     ...
 
 
-def list_products() -> list:
-    
-    try:
-        file = open(f"{PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
-    except FileNotFoundError:
-        sys.exit(f"File not found in {PRODUCTS_DIRECTORY}{PRODUCTS_FILE}")
-    
-    return list(map(str.strip, file))
+def list_products(p: Persist) -> list:
+
+    file = p.open_to("r")
+    products: list = [ line.strip() for line in file ]
+    file.close()
+
+    return products
 
 
 if __name__ == "__main__":
