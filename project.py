@@ -71,7 +71,7 @@ def get_ints(prompt: str) -> list:
 
     if matches := re.findall(r"\b(\d+)\b", prompt.strip()):
         return [ int(match) for match in matches ]
-
+    return []
 
 def list_products(p: Persist) -> list:
 
